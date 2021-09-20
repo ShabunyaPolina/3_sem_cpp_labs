@@ -1,8 +1,7 @@
 #include <iostream>
 #include <string>
 
-//#include "bidirectional_list.h"
-#include "aggregate.h"
+#include "bidirectional_list.h"
 #include "iterator.h"
 
 int main() {
@@ -122,12 +121,11 @@ int main() {
 //        std::cout << "////////// != //////////\n";
 
 
-//            ITERATOR TESTS
+//            VISITOR TESTS
 
-BidirectionalList<std::string> list({"Minsk", "Moscow",
-                                     "Kiev", "Paris", "Berlin"});
-Iterator<std::string>* iterator = list.CreateIterator();
-    std::cout << std::endl;
+//    BidirectionalList<int> list({1, 2, 3, 4, 5});
+//    VisitorToString<int> vts;
+//    list.ExecuteOperation((Visitor<int>*)&vts);
 
     return 0;
 }
