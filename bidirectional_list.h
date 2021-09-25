@@ -43,7 +43,7 @@ public:
     Iterator<T>* CreateReverseIterator() const override;
     [[nodiscard]] int GetHead() const;
     [[nodiscard]] int GetCapacity() const;
-    //void ExecuteOperation(Visitor<T>* visitor);
+    void ExecuteOperation(Visitor<T>* visitor);
 
 private:
     const int INITIAL_CAPACITY {10};
@@ -360,12 +360,13 @@ int BidirectionalList<T>::GetCapacity() const {
     return capacity_;
 }
 
-//template <class T>
-//void BidirectionalList<T>::ExecuteOperation(Visitor<T>* visitor) {
-//    Iterator<T>* i = CreateIterator();
-//    for(i->First(); !i->IsDone(); i->Next()) {
-//        visitor->Visit(Get(i));
-//    }
-//}
+template <class T>
+void BidirectionalList<T>::ExecuteOperation(Visitor<T>* visitor) {
+    Iterator<T>* i = CreateIterator();
+    for(i->First(); !i->IsDone(); i->Next()) {
+   // for(int i = 0; i < size_; ++i) {
+        visitor->Visit(i->CurrentItem());
+    }
+}
 
 #endif  // BIDIRECTIONAL_LIST_H

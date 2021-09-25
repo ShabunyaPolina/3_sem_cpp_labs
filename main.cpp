@@ -9,21 +9,21 @@ int main() {
 
     //---------------constructors------------------------
 
-    std::cout << "default constructor:\n";
-    BidirectionalList<int> list1;
-    list1.Show();
-    std::cout << "\nconstructor with certain capacity:\n";
-    BidirectionalList<std::string> list2(6);
-    list2.Show();
-    std::cout << "\nconstructor by std::initializer_list:\n";
-    BidirectionalList<int> list3({1, 2, 3, 4, 5, 6, 7, 8});
-    list3.Show();
-    std::cout << "\ncopy constructor:\n";
-    BidirectionalList<int> list4(list3);
-    list4.Show();
-    std::cout << "\nmove constructor\n";
-    BidirectionalList<int> list5(std::move(list3));
-    list5.Show();
+//    std::cout << "default constructor:\n";
+//    BidirectionalList<int> list1;
+//    list1.Show();
+//    std::cout << "\nconstructor with certain capacity:\n";
+//    BidirectionalList<std::string> list2(6);
+//    list2.Show();
+//    std::cout << "\nconstructor by std::initializer_list:\n";
+//    BidirectionalList<int> list3({1, 2, 3, 4, 5, 6, 7, 8});
+//    list3.Show();
+//    std::cout << "\ncopy constructor:\n";
+//    BidirectionalList<int> list4(list3);
+//    list4.Show();
+//    std::cout << "\nmove constructor\n";
+//    BidirectionalList<int> list5(std::move(list3));
+//    list5.Show();
 
     //--------------------- copy= ----------------------------
 
@@ -123,9 +123,10 @@ int main() {
 
 //            VISITOR TESTS
 
-//    BidirectionalList<int> list({1, 2, 3, 4, 5});
-//    VisitorToString<int> vts;
-//    list.ExecuteOperation((Visitor<int>*)&vts);
+    BidirectionalList<int> list({1, 2, 3, 4, 5});
+    VisitorToString<int> vts;
+    list.ExecuteOperation(&vts);
+    std::cout << vts.GetString();
 
     return 0;
 }

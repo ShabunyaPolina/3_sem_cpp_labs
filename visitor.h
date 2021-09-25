@@ -11,7 +11,7 @@ public:
 
 // visitor for elements of string type
 template <class T>
-class VisitorToString : Visitor<T> {
+class VisitorToString : public Visitor<T> {
 public:
     void Visit(int elem) override;
     [[nodiscard]] std::string GetString() const;
