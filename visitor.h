@@ -9,7 +9,7 @@ public:
     virtual void Visit(T elem) = 0;
 };
 
-// visitor for elements of string type
+// 1
 template <class T>
 class VisitorToString : public Visitor<T> {
 public:
@@ -29,14 +29,14 @@ std::string VisitorToString<T>::GetString() const {
     return str;
 }
 
-// visitor for elements of integer type
+// 2
 template <class T>
 class SumVisitor : Visitor<T> {
 public:
     void Visit(int elem) override;
     [[nodiscard]] int GetSum() const;
 private:
-    int sum {0};
+    int sum{ 0 };
 };
 
 template <class T>

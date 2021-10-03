@@ -9,8 +9,9 @@
 #include "iterator.h"
 #include "visitor.h"
 
+// model
 template <class T>
-class BidirectionalList : public Aggregate<T>{
+class BidirectionalList : public Aggregate<T> {
 public:
     BidirectionalList();
     explicit BidirectionalList(int capacity);
@@ -18,36 +19,40 @@ public:
     BidirectionalList(const BidirectionalList<T>& list);
     BidirectionalList(BidirectionalList<T>&& list) noexcept;
     ~BidirectionalList();
-    void Swap(BidirectionalList<T>& list1, BidirectionalList<T>& list2);
+
+    T& Get(int index) const;
+    [[nodiscard]] int GetHead() const;
+    [[nodiscard]] int GetCapacity() const;
     [[nodiscard]] bool IsEmpty() const noexcept;
     [[nodiscard]] int Size() const noexcept;
     void Clear();
     T& Front() const;
     T& Back() const;
+
     void PushFront(const T& value);
     void PushBack(const T& value);
     void PopFront();
     void PopBack();
+
     void Resize();
     void Resize(int new_capacity);
+    void Swap(BidirectionalList<T>& list1, BidirectionalList<T>& list2);
+    void Show();
+
     BidirectionalList<T> operator+(const BidirectionalList<T>& another_list);
     BidirectionalList<T>& operator+=(const BidirectionalList<T>& another_list);
     BidirectionalList<T>& operator=(const BidirectionalList<T>& another_list);
     BidirectionalList<T>& operator=(BidirectionalList<T>&& another_list) noexcept;
     bool operator==(const BidirectionalList<T>& another_list);
     bool operator!=(const BidirectionalList<T>& another_list);
-    void Show();
 
-    T& Get(int index) const;
     Iterator<T>* CreateIterator() const override;
     Iterator<T>* CreateReverseIterator() const override;
-    [[nodiscard]] int GetHead() const;
-    [[nodiscard]] int GetCapacity() const;
     void ExecuteOperation(Visitor<T>* visitor);
 
 private:
-    const int INITIAL_CAPACITY {10};
-    const float RESIZE_FACTOR {1.5};
+    const int INITIAL_CAPACITY{ 10 };
+    const int RESIZE_FACTOR{ 2 };
     int capacity_;
     int head_;
     int size_;
@@ -76,7 +81,7 @@ BidirectionalList<T>::BidirectionalList(int capacity) : capacity_(capacity),
 // constructor by std::initializer_list
 template <class T>
 BidirectionalList<T>::BidirectionalList(const std::initializer_list<T>& list)
-        : capacity_(list.size() * RESIZE_FACTOR),
+        : capacity_(list.size()* RESIZE_FACTOR),
           size_(list.size()),
           head_((capacity_ - list.size()) / 2 + 1),
           list_ptr_(new T[capacity_]) {
@@ -90,14 +95,14 @@ BidirectionalList<T>::BidirectionalList(const BidirectionalList<T>& list)
         : capacity_(list.capacity_),
           head_(list.head_),
           size_(list.size_),
-          list_ptr_(new T[list.capacity_]){
+          list_ptr_(new T[list.capacity_]) {
     std::cout << "-> copy constructor\n";
     std::uninitialized_copy(list.list_ptr_, list.list_ptr_ + list.capacity_, list_ptr_);
 }
 
 // move constructor
 template <class T>
-BidirectionalList<T>::BidirectionalList(BidirectionalList<T> &&list) noexcept
+BidirectionalList<T>::BidirectionalList(BidirectionalList<T>&& list) noexcept
         : capacity_(0),
           head_(0),
           size_(0),
@@ -110,11 +115,14 @@ BidirectionalList<T>::BidirectionalList(BidirectionalList<T> &&list) noexcept
 template <class T>
 BidirectionalList<T>::~BidirectionalList() { delete[] list_ptr_; }
 
-// swaps two lists
 template <class T>
-void BidirectionalList<T>::Swap(BidirectionalList<T>& list1, BidirectionalList<T>& list2) {
-    std::cout << "-> swap\n";
-    std::swap(list1, list2);
+int BidirectionalList<T>::GetHead() const {
+    return head_;
+}
+
+template <class T>
+int BidirectionalList<T>::GetCapacity() const {
+    return capacity_;
 }
 
 // checks if the list is empty
@@ -128,8 +136,8 @@ int BidirectionalList<T>::Size() const noexcept { return size_; }
 // removes all elements of the list
 template <class T>
 void BidirectionalList<T>::Clear() {
-    if(size_ == 0) return;
-    while(size_ != 0) {
+    if (size_ == 0) return;
+    while (size_ != 0) {
         PopBack();
     }
     head_ = capacity_ / 2;
@@ -138,36 +146,26 @@ void BidirectionalList<T>::Clear() {
 // returns the first element of the list
 template <class T>
 T& BidirectionalList<T>::Front() const {
-    try{
-        if(size_ == 0)
-            throw std::exception();
-    }
-    catch(const std::exception& e){
-        std::cout << "no elements ";
-    }
+    if (size_ == 0)
+        throw std::exception();
     return list_ptr_[head_ - 1];
 }
 
 // returns the last element of the list
 template <class T>
 T& BidirectionalList<T>::Back() const {
-    try{
-        if(size_ == 0)
-            throw std::exception();
-    }
-    catch(const std::exception& e){
-        std::cout << "no elements ";
-    }
+    if (size_ == 0)
+        throw std::exception();
     return list_ptr_[head_ + size_ - 2];
 }
 
 // insert an element at the top of the list
 template <class T>
 void BidirectionalList<T>::PushFront(const T& value) {
-    if(head_ == 1)
+    if (head_ == 1)
         Resize();
-    if(size_ != 0)
-        --head_;
+    if (size_ != 0)
+    -head_;
     list_ptr_[head_ - 1] = value;
     ++size_;
 }
@@ -175,34 +173,24 @@ void BidirectionalList<T>::PushFront(const T& value) {
 // removes one element from the top of the list
 template <class T>
 void BidirectionalList<T>::PopFront() {
-    try{
-        if(size_ == 0)
-            throw std::exception();
-        ++head_;
-        --size_;
-    }
-    catch(const std::exception& e){
-        std::cout << "no elements\n";
-    }
+    if (size_ == 0)
+        throw std::exception();
+    ++head_;
+    -size_;
 }
 
 // removes one element from the end of the list
 template <class T>
 void BidirectionalList<T>::PopBack() {
-    try{
-        if(size_ == 0)
-            throw std::exception();
-        --size_;
-    }
-    catch(const std::exception& e){
-        std::cout << "no elements\n";
-    }
+    if (size_ == 0)
+        throw std::exception();
+    -size_;
 }
 
 // inserts an element at the end of the list
 template <class T>
 void BidirectionalList<T>::PushBack(const T& value) {
-    if(head_ + size_ - 1 == capacity_)
+    if (head_ + size_ - 1 == capacity_)
         Resize();
     list_ptr_[head_ + size_ - 1] = value;
     ++size_;
@@ -217,13 +205,20 @@ void BidirectionalList<T>::Resize() {
 // changes the current capacity into given value
 template <class T>
 void BidirectionalList<T>::Resize(int new_capacity) {
-    if(new_capacity > capacity_) {
-        BidirectionalList<T> tmp (new_capacity);
-        tmp.head_ = (new_capacity -  capacity_) / 2 + head_;
+    if (new_capacity > capacity_) {
+        BidirectionalList<T> tmp(new_capacity);
+        tmp.head_ = (new_capacity - capacity_) / 2 + head_;
         tmp.size_ = size_;
-        std::uninitialized_copy(list_ptr_, list_ptr_ + capacity_, tmp.list_ptr_ + (new_capacity -  capacity_) / 2);
+        std::uninitialized_copy(list_ptr_, list_ptr_ + capacity_, tmp.list_ptr_ + (new_capacity - capacity_) / 2);
         Swap(*this, tmp);
     }
+}
+
+// swaps two lists
+template <class T>
+void BidirectionalList<T>::Swap(BidirectionalList<T>& list1, BidirectionalList<T>& list2) {
+    std::cout << "-> swap\n";
+    std::swap(list1, list2);
 }
 
 // '+' operator overloading
@@ -260,7 +255,7 @@ template <class T>
 BidirectionalList<T>& BidirectionalList<T>::operator=(const BidirectionalList<T>& another_list) {
     if (this != &another_list) {
         std::cout << "-> copy=\n";
-        BidirectionalList<T> tmp{another_list};
+        BidirectionalList<T> tmp{ another_list };
         Swap(tmp, *this);
     }
     return *this;
@@ -287,25 +282,27 @@ BidirectionalList<T>& BidirectionalList<T>::operator=(BidirectionalList<T>&& ano
 // '==' operator overloading
 template <class T>
 bool BidirectionalList<T>::operator==(const BidirectionalList<T>& another_list) {
-    if(size_ != another_list.size_)
+    if (size_ != another_list.size_)
         return false;
     int counter = size_;
     int i = head_ - 1;
     int j = another_list.head_ - 1;
-    while(--counter >= 0) {
-        if(this->list_ptr_[i] != another_list.list_ptr_[j])
+    while (--counter >= 0) {
+        if
+                (this->list_ptr_[i] != another_list.list_ptr_[j])
             return false;
     }
     return true;
 }
 
+// '«' operator overloading
 template <class T1>
-std::ostream& operator<< (std::ostream &out, const BidirectionalList<T1>& list) {
-    Iterator<T1>* i = list.CreateIterator();
-    for(i->First(); !i->IsDone(); i->Next()) {
-        out << i->CurrentItem() << ' ';
-    }
-    return out;
+std::ostream& operator<< (std::ostream& out, const BidirectionalList<T1>& list) {
+Iterator<T1>* i = list.CreateIterator();
+for (i->First(); !i->IsDone(); i->Next()) {
+out << i->CurrentItem() << ' ';
+}
+return out;
 }
 
 // '!=' operator overloading
@@ -324,49 +321,35 @@ void BidirectionalList<T>::Show() {
     IsEmpty() ? std::cout << "\nIsEmpty\n" : std::cout << "\nIsNotEmpty\n";
     std::cout << *this;
     std::cout << "\nfirst elem: " << Front()
-              << "\nlast elem:  " << Back();
+            << "\nlast elem: " << Back();
     std::cout << "\n--------------------------\n";
 }
 
+// returns the element by index
 template <class T>
 T& BidirectionalList<T>::Get(int index) const {
-    try{
-        if (index < head_ - 1 || index > head_ + size_ - 1)
-            throw std::exception();
-        return list_ptr_[index];
-    }
-    catch(const std::exception& e){
-        std::cout << "index out of bounds\n";
-    }
+    if (index < head_ - 1 || index > head_ + size_ - 1)
+        throw std::exception();
+    return list_ptr_[index];
 }
 
+// create objects of class Iterator
 template <class T>
 Iterator<T>* BidirectionalList<T>::CreateIterator() const {
     return new BidirectionalListIterator<T>(this);
 }
-
 template <class T>
 Iterator<T>* BidirectionalList<T>::CreateReverseIterator() const {
     return new ReverseBidirectionalListIterator<T>(this);
 }
 
-template <class T>
-int BidirectionalList<T>::GetHead() const{
-    return head_;
-}
-
-template <class T>
-int BidirectionalList<T>::GetCapacity() const {
-    return capacity_;
-}
-
+// performs actions defined by the Visitor class
 template <class T>
 void BidirectionalList<T>::ExecuteOperation(Visitor<T>* visitor) {
     Iterator<T>* i = CreateIterator();
-    for(i->First(); !i->IsDone(); i->Next()) {
-   // for(int i = 0; i < size_; ++i) {
+    for (i->First(); !i->IsDone(); i->Next()) {
         visitor->Visit(i->CurrentItem());
     }
 }
 
-#endif  // BIDIRECTIONAL_LIST_H
+#endif // BIDIRECTIONAL_LIST_H
